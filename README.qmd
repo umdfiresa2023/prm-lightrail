@@ -1,5 +1,9 @@
-# Charlotte Lynx Blue Line’s Impact on Air Pollution
-Samirah Huda and Landon Thomas
+---
+title: "Charlotte Lynx Blue Line's Impact on Air Pollution"
+author: "Samirah Huda and Landon Thomas"
+format: gfm
+editor: visual
+---
 
 ## Research Question
 
@@ -11,6 +15,12 @@ Samirah Huda and Landon Thomas
 
 Samirah explain how you get PM2.5 data for each city here
 
+```{r}
+#| eval: false
+
+
+```
+
 **Meteorology data from NOAA**
 
 Landon explains work here
@@ -21,19 +31,15 @@ Landon explains work here
 
 Samirah to work on this part
 
-We use data before Charlotte’s light rail opening to predict future
-PM2.5 levels had the light rail not opened. We then compare the
-predicted PM2.5 data with actual data after light rail opening data.
+We use data before Charlotte's light rail opening to predict future PM2.5 levels had the light rail not opened. We then compare the predicted PM2.5 data with actual data after light rail opening data.
 
-Machine learning methods we used include….
+Machine learning methods we used include....
 
 Create training data
 
-``` r
+```{r}
 1 + 1
 ```
-
-    [1] 2
 
 Estimate RMSE from each algorithm
 
