@@ -36,9 +36,7 @@ train<-shuffled %>%
 
 test<-shuffled %>%
   dplyr::slice(101:145)
-
 ```
-
 Estimate RMSE with the Random Forest model
 ``` r
 model4 <- ranger(new_monthly_avg ~ ., data=train, importance='impurity')
@@ -68,8 +66,6 @@ rf_df<-cbind(openlr, rf_pred)
 ```
 Estimate RMSE with the XGBoost model
 ``` r
-# install.packages("xgboost")
-
 # Split data in to test and train group
 set.seed(112)
 
@@ -96,14 +92,11 @@ test_y = test[, 4]
 xgb_train = xgb.DMatrix(data = train_x, label = train_y)
 xgb_test = xgb.DMatrix(data = test_x, label = test_y)
 
-#define watchlist
 watchlist = list(train=xgb_train, test=xgb_test)
 
 #fit XGBoost model
 xgb_model = xgboost(data = xgb_train, max.depth = 3, nrounds = 14, verbose = 0)
-
 predict_xgb<-predict(xgb_model, xgb_test)
-
 rmse_test_xgb<-sqrt(mean(test_y-predict_xgb)^2)
 
 rmse_test_xgb
@@ -126,7 +119,6 @@ xgb_all = xgb.DMatrix(data = all_x, label = all_y)
 predict_all_xgb<-predict(xgb_model, xgb_all)
 
 xgb_df<-cbind(rf_df, predict_all_xgb)
-
 ```
 
 Plot predicted PM2.5 with actual data
@@ -144,21 +136,16 @@ predict_test<-predict(model4, lr_removed)
 # xgb model with all data
 matrix <- data.matrix(lr_removed)
 
-my<-df2 %>%
+my <- df2 %>%
   dplyr::select(lr_month, month, year, city)
 
 pred_df<-merge(xgb_df, my, by=c("month","year", "city"), all.x=TRUE)
 
-p<-ggplot() + 
+p <- ggplot() + 
   geom_line(data = df2, aes(x = lr_month, y = new_monthly_avg, color = "Actual Data"), size=1) + facet_wrap(~ city) +
   geom_line(data=pred_df, aes(x = lr_month, y = rf_pred, color = "RF Counterfactual"), size=1) + facet_wrap(~ city) +
-  geom_line(data=pred_df, aes(x = lr_month, y = predict_all_xgb, color = "XGB Counterfactual"), size=1) + facet_wrap(~ city) + 
-  #geom_smooth(data = pred_df, aes(x = lr_month, y = new_monthly_avg), color = "black", se = FALSE) + 
-  #geom_smooth(data = pred_df, aes(x = lr_month, y = rf_pred), color = "red", se = FALSE) +
-  #geom_smooth(data = pred_df, aes(x = lr_month, y = predict_all_xgb), color = "blue", se = FALSE) +
+  geom_line(data=pred_df, aes(x = lr_month, y = predict_all_xgb, color = "XGB Counterfactual"), size=1) + facet_wrap(~ city) +
   xlab("Months since light rail opening") + ylab("Mean PM2.5 (μg/m3)") + geom_vline(xintercept=0, linetype="dashed")+theme_bw()
-
-ggsave(p, filename="G:/Shared drives/2023 FIRE-SA PRM/Spring Research/Light Rails/OUTPUT/rf_xgb_graph.png", dpi=500, width=8, height=5, unit="in")
 ```
 
 **Comparing PM2.5 Changes with Counterfactual Cities**
