@@ -9,6 +9,8 @@ editor: visual
 
 What effect does the Lynx Blue Line light rail have on urban air pollution in Charlotte, South Carolina?
 
+What effect does the Lynx Blue Line light rail have on urban air pollution in Charlotte, South Carolina?
+
 ## Background
 
 ## Data
@@ -47,6 +49,50 @@ library("xgboost")
 
 
 updated <- read.csv("merged_pm25.csv")
+```
+
+# adjust data for machine learning models
+
+```{r}
+updated2<-updated %>%
+  mutate(city=as.factor(city))%>%
+  dplyr::select(-temp, -date, -meanpm25)
+```
+
+# Machine Learning Models:
+
+# Upload and clean data
+
+```{r}
+df2<-updated2 %>%
+  filter(lr_month<=36 & lr_month>= -36)
+
+df3<-df2 %>%
+  filter(lr_op < 1) %>%
+  dplyr::select(-lr_op, -lr_month)
+
+sapply(lapply(df2, unique), length)
+```
+
+# Split data in to test and train group
+
+We used data before Charlotte's light rail opening to predict future PM2.5 levels had the light rail not opened. We then compared the predicted PM2.5 data with actual data after the light rail opening data. This comparison allowed us to gain more insight about whether or not the PM2.5 concentrations would have been higher if the light rail had not opened.
+
+Machine learning methods we used include the Random Forest model and the XGBoost model.
+
+Create training data
+
+```{r}
+library("tidyverse")
+library("dplyr")
+library("leaps")
+library("rpart")
+library("rpart.plot")
+library("vip")
+library("ranger")
+library("xgboost")
+
+updated <- read.csv("merged_pm25.csv")
 
 # adjust data for machine learning models
 updated2<-updated %>%
@@ -54,7 +100,6 @@ updated2<-updated %>%
   dplyr::select(-temp, -date, -meanpm25)
 
 # Machine Learning Models:
-
 
 # Upload and clean data
 df2<-updated2 %>%
@@ -65,8 +110,6 @@ df3<-df2 %>%
   dplyr::select(-lr_op, -lr_month)
 
 sapply(lapply(df2, unique), length)
-
-# Split data in to test and train group
 
 set.seed(112)
 
@@ -108,11 +151,8 @@ openlr <- updated %>%
 predict_test<-predict(model4, openlr)
 
 rf_pred<-predict_test$predictions
-
 rf_df<-cbind(openlr, rf_pred)
 ```
-
-In this chart, the importance represents how heavily each variable influences the model. The higher the importance, the higher the impact that variable has. Here, the variable that most heavily influenced the results is the city. The second most influential variable is population, the third most is vapor pressure squared, and so on.
 
 Estimate RMSE with the XGBoost model
 
