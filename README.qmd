@@ -15,15 +15,7 @@ What effect does the Lynx Blue Line light rail have on urban air pollution in Ch
 
 **PM2.5 Data from SEDAC**
 
-We obtained daily PM2.5 concentrations for the contiguous United States
-at 1 km spatial resolution for the years 2000 to 2016 in GeoTIFF format
-from NASA\'s Socioeconomic Data and Applications Center (SEDAC). We then
-found the coordinates of the city center for the target city and each
-control city, and we created a buffer with a 10 kilometer radius around
-each city center. Finally, we cropped and adjusted the projections of
-the GeoTIFF files and extracted the PM2.5 data, creating a CSV file of
-the data set containing the monthly average PM2.5 concentrations for
-each city.
+We obtained daily PM2.5 concentrations for the contiguous United States at 1 km spatial resolution for the years 2000 to 2016 in GeoTIFF format from NASA's Socioeconomic Data and Applications Center (SEDAC). We then found the coordinates of the city center for the target city and each control city, and we created a buffer with a 10 kilometer radius around each city center. Finally, we cropped and adjusted the projections of the GeoTIFF files and extracted the PM2.5 data, creating a CSV file of the data set containing the monthly average PM2.5 concentrations for each city.
 
 Landon explains work here
 
@@ -31,13 +23,15 @@ Landon explains work here
 
 **Machine Learning to Compare Predicted Baseline with Actual Data**
 
-We used data before Charlotte\'s light rail opening to predict future PM2.5 levels had the light rail not opened. We then compared the predicted PM2.5 data with actual data after the light rail opening data. This comparison allowed us to gain more insight about whether or not the PM2.5 concentrations would have been higher if the light rail had not opened.
+We used data before Charlotte's light rail opening to predict future PM2.5 levels had the light rail not opened. We then compared the predicted PM2.5 data with actual data after the light rail opening data. This comparison allowed us to gain more insight about whether or not the PM2.5 concentrations would have been higher if the light rail had not opened.
 
 Machine learning methods we used include the Random Forest model and the XGBoost model.
 
 Create training data
 
 ```{r}
+#| warning: false
+#| message: false
 #install.packages("rmarkdown")
 #install.packages("terra")
 #install.packages("tidyverse")
@@ -52,7 +46,7 @@ library("ranger")
 library("xgboost")
 
 
-updated <- read.csv("G:/Shared drives/2023 FIRE-SA PRM/Spring Research/Light Rails/DATA/merged_pm25.csv")
+updated <- read.csv("merged_pm25.csv")
 
 # adjust data for machine learning models
 updated2<-updated %>%
@@ -85,13 +79,17 @@ test<-shuffled %>%
   dplyr::slice(101:145)
 ```
 
-Estimate RMSE from each algorithm
+Estimate RMSE from the Random Forest Model
 
 ```{r}
 model4 <- ranger(new_monthly_avg ~ ., data=train, importance='impurity')
 v1 <- vip(model4)
 v1
+```
 
+In this chart, the importance represents how heavily each variable influences the model. The higher the importance, the higher the impact that variable has. Here, the variable that most heavily influenced the results is the city. The second most influential variable is population, the third most is vapor pressure squared, and so on.
+
+```{r}
 #rf model evaluation
 predict_test<-predict(model4, test)
 
@@ -113,6 +111,8 @@ rf_pred<-predict_test$predictions
 
 rf_df<-cbind(openlr, rf_pred)
 ```
+
+In this chart, the importance represents how heavily each variable influences the model. The higher the importance, the higher the impact that variable has. Here, the variable that most heavily influenced the results is the city. The second most influential variable is population, the third most is vapor pressure squared, and so on.
 
 Estimate RMSE with the XGBoost model
 
@@ -194,17 +194,23 @@ my <- df2 %>%
 pred_df<-merge(xgb_df, my, by=c("month","year", "city"), all.x=TRUE)
 
 p <- ggplot() + 
-  geom_line(data = df2, aes(x = lr_month, y = new_monthly_avg, color = "Actual Data"), size=1) + facet_wrap(~ city) +
-  geom_line(data=pred_df, aes(x = lr_month, y = rf_pred, color = "RF Counterfactual"), size=1) + facet_wrap(~ city) +
-  geom_line(data=pred_df, aes(x = lr_month, y = predict_all_xgb, color = "XGB Counterfactual"), size=1) + facet_wrap(~ city) +
+  geom_line(data = df2, aes(x = lr_month, y = new_monthly_avg, color = "Actual Data"), linewidth=1) + facet_wrap(~ city) +
+  geom_line(data=pred_df, aes(x = lr_month, y = rf_pred, color = "RF Counterfactual"), linewidth=1) + facet_wrap(~ city) +
+  geom_line(data=pred_df, aes(x = lr_month, y = predict_all_xgb, color = "XGB Counterfactual"), linewidth=1) + facet_wrap(~ city) +
   xlab("Months since light rail opening") + ylab("Mean PM2.5 (μg/m3)") + geom_vline(xintercept=0, linetype="dashed")+theme_bw()
+
+p
 ```
+
+This plot compares the actual concentrations of PM2.5, and the predicted levels of PM2.5 predicted by both the Random Forest model and the XGBoost model, before and after light rails opened in Charlotte, Houston, Minneapolis, and Phoenix.
 
 **Comparing PM2.5 Changes with Counterfactual Cities**
 
 Landon work on this part
 
 ## Conclusion
+
+Based on the machine learning models, the higher the RMSE (error squared), the less accurate the model is. In this study, the Random Forest Model produced a RMSE value of 0.2596, while the XGBoost model produced a RMSE value of 0.4430. Therefore, in this study, the Random Forest Model proved to be more accurate for predicting PM2.5 concentrations in these four cities had light rails not opened.
 
 ## References
 
