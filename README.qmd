@@ -141,6 +141,8 @@ prep4 <- prep3 %>%
 Creating the synthetic control using the Synth package.
 
 ```{r}
+library("Synth")
+prep4 <- read.csv("prep4.csv")
 dataprep.out <- dataprep(prep4, 
                          time.predictors.prior = 1:(8*12),
                          predictors.op = "mean",
