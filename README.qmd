@@ -18,7 +18,6 @@ Samirah explain how you get PM2.5 data for each city here
 ```{r}
 #| eval: false
 
-
 ```
 
 **Meteorology data from NOAA**
