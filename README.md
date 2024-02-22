@@ -312,7 +312,7 @@ XGBoost model, before and after light rails opened in Charlotte,
 Houston, Minneapolis, and Phoenix.
 
     
-** Using Synthetic Control to Compare PM2.5 Changes with Counterfactual Cities **    
+**Using Synthetic Control to Compare PM2.5 Changes with Counterfactual Cities**    
     
 We gathered a list of cities with similar characteristics to Charlotte and downloaded EPA PM2.5 data for each of the cities to gather a rough idea of which city had a similar trend to Charlotte, before receiving the treatment. This allowed us to build a counterfactual control city to estimate the effect of the treatment. The Synth package was used in the creation of the counterfactual.
 
