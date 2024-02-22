@@ -96,7 +96,7 @@ sapply(lapply(df2, unique), length)
                       pop2                   gdp2 
                         28                     28 
 
-# Split data in to test and train group
+Split data in to test and train group
 
 We used data before Charlotte’s light rail opening to predict future
 PM2.5 levels had the light rail not opened. We then compared the
@@ -312,7 +312,7 @@ XGBoost model, before and after light rails opened in Charlotte,
 Houston, Minneapolis, and Phoenix.
 
     
-# Using Synthetic Control to Compare PM2.5 Changes with Counterfactual Cities    
+** Using Synthetic Control to Compare PM2.5 Changes with Counterfactual Cities **    
     
 We gathered a list of cities with similar characteristics to Charlotte and downloaded EPA PM2.5 data for each of the cities to gather a rough idea of which city had a similar trend to Charlotte, before receiving the treatment. This allowed us to build a counterfactual control city to estimate the effect of the treatment. The Synth package was used in the creation of the counterfactual.
 
@@ -521,9 +521,5 @@ Forest Model produced a RMSE value of 0.2596, while the XGBoost model
 produced a RMSE value of 0.4430. Therefore, in this study, the Random
 Forest Model proved to be more accurate for predicting PM2.5
 concentrations in these four cities had light rails not opened.
-
-## References
-
-Cite papers in APA format
 
 ## 
