@@ -1,15 +1,15 @@
 # Charlotte Lynx Blue Line’s Impact on Air Pollution
 Samirah Huda and Landon Thomas
 
-## Research Question
+# Research Question
 
 What effect does the Lynx Blue Line light rail have on urban air
 pollution in Charlotte, South Carolina?
 
-
-## Data
+# Data
 
 **PM2.5 Data from SEDAC**
+
 We obtained daily PM2.5 concentrations for the contiguous United States
 at 1 km spatial resolution for the years 2000 to 2016 in GeoTIFF format
 from NASA’s Socioeconomic Data and Applications Center (SEDAC). We then
@@ -20,83 +20,28 @@ the GeoTIFF files and extracted the PM2.5 data, creating a CSV file of
 the data set containing the monthly average PM2.5 concentrations for
 each city.
 
+# Estimation Methodology & Results
 
-**Meteorology data from NOAA**
+## **Machine Learning to Compare Predicted Baseline with Actual Data**
+
+We used data before Charlotte’s light rail opening to predict future
+PM2.5 levels had the light rail not opened. We then compared the
+predicted PM2.5 data with actual data after the light rail opening data.
+This comparison allowed us to gain more insight about whether or not the
+PM2.5 concentrations would have been higher if the light rail had not
+opened.
+
+Machine learning methods used include the Random Forest model and the
+XGBoost model.
+
+**Data cleaning**
+
 We complied 3 daily weather variables, average wind, precipitation, and
 average temperature in 4 cities from 2000 to 2016. The weather variables
 were recorded by NOAA from monitoring stations at the airport in each
 city.
 
-## Estimation Methodology & Results
-
-**Machine Learning to Compare Predicted Baseline with Actual Data**
-
-
-We use data before Charlotte’s light rail opening to predict future
-PM2.5 levels had the light rail not opened. We then compare the
-predicted PM2.5 data with actual data after light rail opening data.
-
-This comparison allowed us to gain more insight about whether or not the
-PM2.5 concentrations would have been higher if the light rail had not
-opened.
-
-Machine learning methods we used include the Random Forest model and the
-XGBoost model.
-
-Create training data
-
-``` r
-#install.packages("rmarkdown")
-#install.packages("terra")
-#install.packages("tidyverse")
-#install.packages("dplyr")
-library("tidyverse")
-library("dplyr")
-library("leaps")
-library("rpart")
-library("rpart.plot")
-library("vip")
-library("ranger")
-library("xgboost")
-
-updated <- read.csv("merged_pm25.csv")
-```
-
-Clean data to feed into machine learning models
-
-``` r
-updated2<-updated %>%
-  mutate(city=as.factor(city))%>%
-  dplyr::select(-temp, -date, -meanpm25)
-```
-
-``` r
-df2<-updated2 %>%
-  filter(lr_month<=36 & lr_month>= -36)
-
-df3<-df2 %>%
-  filter(lr_op < 1) %>%
-  dplyr::select(-lr_op, -lr_month)
-
-sapply(lapply(df2, unique), length)
-```
-
-                      city                  month                   year 
-                         4                     12                     12 
-           new_monthly_avg    Frost_Day_Frequency          Precipitation 
-                       292                     97                    205 
-          Mean_Temperature         Vapor_Pressure Cloud_Cover_Percentage 
-                       171                    135                    169 
-                       pop                    gdp                  lr_op 
-                        28                     28                      2 
-                  lr_month                   fdf2                     p2 
-                        73                     97                    205 
-                       mt2                    vp2                   ccp2 
-                       158                    135                    169 
-                      pop2                   gdp2 
-                        28                     28 
-
-Split data in to test and train group
+**Split data in to test and train group**
 
 We used data before Charlotte’s light rail opening to predict future
 PM2.5 levels had the light rail not opened. We then compared the
@@ -108,18 +53,49 @@ opened.
 Machine learning methods we used include the Random Forest model and the
 XGBoost model.
 
-Create training data
-
 ``` r
 library("tidyverse")
+```
+
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.1.1     ✔ readr     2.1.4
+    ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+    ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+    ✔ purrr     1.0.1     
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library("dplyr")
 library("leaps")
 library("rpart")
 library("rpart.plot")
 library("vip")
+```
+
+
+    Attaching package: 'vip'
+
+    The following object is masked from 'package:utils':
+
+        vi
+
+``` r
 library("ranger")
 library("xgboost")
+```
 
+
+    Attaching package: 'xgboost'
+
+    The following object is masked from 'package:dplyr':
+
+        slice
+
+``` r
 updated <- read.csv("merged_pm25.csv")
 
 # adjust data for machine learning models
@@ -165,8 +141,7 @@ train<-shuffled %>%
 
 test<-shuffled %>%
   dplyr::slice(101:145)
-  
- ```
+```
 
 Estimate RMSE from the Random Forest Model
 
@@ -176,7 +151,7 @@ v1 <- vip(model4)
 v1
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-5-1.png)
+![](README_files/figure-commonmark/unnamed-chunk-2-1.png)
 
 In this chart, the importance represents how heavily each variable
 influences the model. The higher the importance, the higher the impact
@@ -202,7 +177,7 @@ openlr <- updated %>%
   mutate(city=as.factor(city))%>%
   dplyr::select(-temp, -date, -meanpm25) %>%
   dplyr::select(-lr_op, -lr_month)
-  
+
 # rf model with all data
 predict_test<-predict(model4, openlr)
 
@@ -247,12 +222,12 @@ predict_xgb<-predict(xgb_model, xgb_test)
 rmse_test_xgb<-sqrt(mean(test_y-predict_xgb)^2)
 
 rmse_test_xgb
-
 ```
+
     [1] 0.4430286
 
 ``` r
- #create data for the graph
+#create data for the graph
 openlr <- updated %>%
   filter(lr_op>0) %>%
   mutate(city=as.factor(city))%>%
@@ -269,11 +244,12 @@ xgb_all = xgb.DMatrix(data = all_x, label = all_y)
 # rf model with all data
 predict_all_xgb<-predict(xgb_model, xgb_all)
 
-xgb_df<-cbind(rf_df, predict_all_xgb)   
-```    
+xgb_df<-cbind(rf_df, predict_all_xgb)
+```
 
 Plot predicted PM2.5 with actual data
-``` r    
+
+``` r
 openlr <- updated %>%
   filter(lr_op>0)
 
@@ -301,32 +277,37 @@ p <- ggplot() +
 p
 ```
 
-    Warning: Removed 59 rows containing missing values (`geom_line()`).
-    Removed 59 rows containing missing values (`geom_line()`).
+    Warning: Removed 59 rows containing missing values or values outside the scale range
+    (`geom_line()`).
+    Removed 59 rows containing missing values or values outside the scale range
+    (`geom_line()`).
 
-![](README_files/figure-commonmark/unnamed-chunk-8-1.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-1.png)
 
 This plot compares the actual concentrations of PM2.5, and the predicted
 levels of PM2.5 predicted by both the Random Forest model and the
 XGBoost model, before and after light rails opened in Charlotte,
 Houston, Minneapolis, and Phoenix.
 
-    
-**Using Synthetic Control to Compare PM2.5 Changes with Counterfactual Cities**    
-    
-We gathered a list of cities with similar characteristics to Charlotte and downloaded EPA PM2.5 data for each of the cities to gather a rough idea of which city had a similar trend to Charlotte, before receiving the treatment. This allowed us to build a counterfactual control city to estimate the effect of the treatment. The Synth package was used in the creation of the counterfactual.
+## **Synthetic Control to Compare PM2.5 Changes Between Charlotte and Counterfactual Cities**
+
+We gathered a list of cities with similar characteristics to Charlotte
+and downloaded EPA PM2.5 data for each of the cities to gather a rough
+idea of which city had a similar trend to Charlotte, before receiving
+the treatment. This allowed us to build a counterfactual control city to
+estimate the effect of the treatment. The Synth package was used in the
+creation of the counterfactual.
 
 Importing the daily EPA PM2.5 data.
 
-    
 ``` r
 for(x in 2000:2016){
   assign(paste0("df",x), read.csv(paste0("/Users/landonthomas/Desktop/Junior Year/Fall Semester/F23 PRM/Data/daily_88101_",x,".csv")))
 }
-
 ```
 
-Adjusting county and state codes for cities that span multiple counties or states.
+Adjusting county and state codes for cities that span multiple counties
+or states.
 
 ``` r
 dfMonth <- dfChar %>%
@@ -341,10 +322,10 @@ dfMonth <- dfChar %>%
 dfMonth2 <- dfMonth %>% 
   group_by(Month, City.Name, County.Code) %>%
   summarize(PM = mean(Arithmetic.Mean))
-  
 ```
-Creating a balance panel to combine with cleaned weather data.    
-    
+
+Creating a balance panel to combine with cleaned weather data.
+
 ``` r
 vector <- as.data.frame(table(dfMonth2$Month))
 
@@ -414,7 +395,6 @@ library("Synth")
 
     ## See https://web.stanford.edu/~jhain/synthpage.html for additional information.
 
-
 ``` r
 prep4 <- read.csv("prep4.csv")
 dataprep.out <- dataprep(prep4, 
@@ -446,7 +426,6 @@ synth.out <- synth(dataprep.out)
     **************** 
 
     MSPE (LOSS V): 12.04959 
-
 
     solution.v:
      3.46696e-05 0.9999653 
@@ -503,8 +482,7 @@ abline(v   = 8*12,
        lty = 2)
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-9-1.png)
-
+![](README_files/figure-commonmark/unnamed-chunk-12-1.png)
 
 A linear combination of the cities using a weighted average, with
 Cincinnati having the most weight, predicts the PM2.5 trends in

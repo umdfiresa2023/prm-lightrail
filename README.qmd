@@ -5,87 +5,33 @@ format: gfm
 editor: visual
 ---
 
-## Research Question
+# Research Question
 
 What effect does the Lynx Blue Line light rail have on urban air pollution in Charlotte, South Carolina?
 
-What effect does the Lynx Blue Line light rail have on urban air pollution in Charlotte, South Carolina?
-
-## Background
-
-## Data
+# Data
 
 **PM2.5 Data from SEDAC**
 
 We obtained daily PM2.5 concentrations for the contiguous United States at 1 km spatial resolution for the years 2000 to 2016 in GeoTIFF format from NASA's Socioeconomic Data and Applications Center (SEDAC). We then found the coordinates of the city center for the target city and each control city, and we created a buffer with a 10 kilometer radius around each city center. Finally, we cropped and adjusted the projections of the GeoTIFF files and extracted the PM2.5 data, creating a CSV file of the data set containing the monthly average PM2.5 concentrations for each city.
 
-Landon explains work here
+# Estimation Methodology & Results
 
-## Estimation Methodology & Results
-
-**Machine Learning to Compare Predicted Baseline with Actual Data**
+## **Machine Learning to Compare Predicted Baseline with Actual Data**
 
 We used data before Charlotte's light rail opening to predict future PM2.5 levels had the light rail not opened. We then compared the predicted PM2.5 data with actual data after the light rail opening data. This comparison allowed us to gain more insight about whether or not the PM2.5 concentrations would have been higher if the light rail had not opened.
 
-Machine learning methods we used include the Random Forest model and the XGBoost model.
+Machine learning methods used include the Random Forest model and the XGBoost model.
 
-Create training data
-
-```{r}
-#| warning: false
-#| message: false
-#install.packages("rmarkdown")
-#install.packages("terra")
-#install.packages("tidyverse")
-#install.packages("dplyr")
-library("tidyverse")
-library("dplyr")
-library("leaps")
-library("rpart")
-library("rpart.plot")
-library("vip")
-library("ranger")
-library("xgboost")
-
-
-updated <- read.csv("merged_pm25.csv")
-
-```
-
-# adjust data for machine learning models
-
+**Data cleaning**
 
 We complied 3 daily weather variables, average wind, precipitation, and average temperature in 4 cities from 2000 to 2016. The weather variables were recorded by NOAA from monitoring stations at the airport in each city.
 
-```{r}
-updated2<-updated %>%
-  mutate(city=as.factor(city))%>%
-  dplyr::select(-temp, -date, -meanpm25)
-```
-
-
-# Machine Learning Models:
-
-# Upload and clean data
-
-```{r}
-df2<-updated2 %>%
-  filter(lr_month<=36 & lr_month>= -36)
-
-df3<-df2 %>%
-  filter(lr_op < 1) %>%
-  dplyr::select(-lr_op, -lr_month)
-
-sapply(lapply(df2, unique), length)
-```
-
-# Split data in to test and train group
+**Split data in to test and train group**
 
 We used data before Charlotte's light rail opening to predict future PM2.5 levels had the light rail not opened. We then compared the predicted PM2.5 data with actual data after the light rail opening data. This comparison allowed us to gain more insight about whether or not the PM2.5 concentrations would have been higher if the light rail had not opened.
 
 Machine learning methods we used include the Random Forest model and the XGBoost model.
-
-Create training data
 
 ```{r}
 library("tidyverse")
@@ -249,7 +195,7 @@ p
 
 This plot compares the actual concentrations of PM2.5, and the predicted levels of PM2.5 predicted by both the Random Forest model and the XGBoost model, before and after light rails opened in Charlotte, Houston, Minneapolis, and Phoenix.
 
-**Comparing PM2.5 Changes with Counterfactual Cities**
+## **Synthetic Control to Compare PM2.5 Changes Between Charlotte and Counterfactual Cities**
 
 We gathered a list of cities with similar characteristics to Charlotte and downloaded EPA PM2.5 data for each of the cities to gather a rough idea of which city had a similar trend to Charlotte, before receiving the treatment. This allowed us to build a counterfactual control city to estimate the effect of the treatment. The Synth package was used in the creation of the counterfactual.
 
@@ -389,9 +335,5 @@ A linear combination of the cities using a weighted average, with Cincinnati hav
 ## Conclusion
 
 Based on the machine learning models, the higher the RMSE (error squared), the less accurate the model is. In this study, the Random Forest Model produced a RMSE value of 0.2596, while the XGBoost model produced a RMSE value of 0.4430. Therefore, in this study, the Random Forest Model proved to be more accurate for predicting PM2.5 concentrations in these four cities had light rails not opened.
-
-## References
-
-Cite papers in APA format
 
 ## 
