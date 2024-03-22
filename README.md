@@ -55,47 +55,14 @@ XGBoost model.
 
 ``` r
 library("tidyverse")
-```
-
-    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ✔ dplyr     1.1.1     ✔ readr     2.1.4
-    ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
-    ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-    ✔ purrr     1.0.1     
-    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ✖ dplyr::filter() masks stats::filter()
-    ✖ dplyr::lag()    masks stats::lag()
-    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library("dplyr")
 library("leaps")
 library("rpart")
 library("rpart.plot")
 library("vip")
-```
-
-
-    Attaching package: 'vip'
-
-    The following object is masked from 'package:utils':
-
-        vi
-
-``` r
 library("ranger")
 library("xgboost")
-```
 
-
-    Attaching package: 'xgboost'
-
-    The following object is masked from 'package:dplyr':
-
-        slice
-
-``` r
 updated <- read.csv("merged_pm25.csv")
 
 # adjust data for machine learning models
@@ -276,11 +243,6 @@ p <- ggplot() +
 
 p
 ```
-
-    Warning: Removed 59 rows containing missing values or values outside the scale range
-    (`geom_line()`).
-    Removed 59 rows containing missing values or values outside the scale range
-    (`geom_line()`).
 
 ![](README_files/figure-commonmark/unnamed-chunk-5-1.png)
 

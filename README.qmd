@@ -34,6 +34,9 @@ We used data before Charlotte's light rail opening to predict future PM2.5 level
 Machine learning methods we used include the Random Forest model and the XGBoost model.
 
 ```{r}
+#| warning: false
+#| message: false
+
 library("tidyverse")
 library("dplyr")
 library("leaps")
@@ -166,6 +169,9 @@ xgb_df<-cbind(rf_df, predict_all_xgb)
 Plot predicted PM2.5 with actual data
 
 ```{r}
+#| warning: false
+#| message: false
+
 openlr <- updated %>%
   filter(lr_op>0)
 
